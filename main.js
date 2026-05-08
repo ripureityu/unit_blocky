@@ -1,10 +1,34 @@
-import { someFunc } from './module.js';
-someFunc();
-// Import Blockly core.
-import * as Blockly from 'blockly/core';
-// Import the default blocks.
-import * as libraryBlocks from 'blockly/blocks';
-// Import a generator.
-import {javascriptGenerator} from 'blockly/javascript';
-// Import a message file.
-import * as En from 'blockly/msg/en';
+// ツールボックス（左側のブロックメニュー）の設定
+const toolbox1 = {
+  "kind": "categoryToolbox",
+  "contents": [
+    {
+      "kind": "category",
+      "name": "論理",
+      "colour": "210",
+      "contents": [
+        { "kind": "block", "type": "controls_if" },
+        { "kind": "block", "type": "logic_compare" }
+      ]
+    },
+    {
+      "kind": "category",
+      "name": "数学",
+      "colour": "230",
+      "contents": [
+        { "kind": "block", "type": "math_number" },
+        { "kind": "block", "type": "math_arithmetic" }
+      ]
+    },
+    
+    
+    // You can add more blocks to this array.
+  ]
+};
+
+
+
+// HTMLで作った空箱(#blocklyDiv)に、Blocklyを注入（表示）する
+const workspace = Blockly.inject('blocklyDiv', {
+  toolbox: toolbox1
+});

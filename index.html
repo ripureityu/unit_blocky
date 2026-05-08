@@ -1,28 +1,20 @@
-<html>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>My Blockly App</title>
+  
+  <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+  
+  <style>
+    /* 画面いっぱいに表示するための設定 */
+    html, body { height: 100%; margin: 0; }
+    #blocklyDiv { height: 100vh; width: 100vw; }
+  </style>
+</head>
 <body>
-   
-<div id="blocklyDiv" style="height: 480px; width: 600px;"></div>
+  <div id="blocklyDiv"></div>
 
-<script type="module">
-const workspace = Blockly.inject(
-document.getElementById('blocklyDiv'), { /* config */ });
-const toolbox = {
-  // There are two kinds of toolboxes. The simpler one is a flyout toolbox.
-  kind: 'flyoutToolbox',
-  // The contents is the blocks and other items that exist in your toolbox.
-  contents: [
-    {
-      kind: 'block',
-      type: 'controls_if'
-    },
-    {
-      kind: 'block',
-      type: 'controls_whileUntil'
-    }
-    // You can add more blocks to this array.
-  ]
-};
-</script>
-
+  <script src="main.js"></script>
 </body>
 </html>
