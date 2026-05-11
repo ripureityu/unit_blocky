@@ -13,13 +13,24 @@ const toolbox1 = {
     },
     {
       "kind": "category",
-      "name": "数学",
+      "name": "演算",
       "colour": "230",
       "contents": [
         { "kind": "block", "type": "math_number" },
         { "kind": "block", "type": "math_arithmetic" }
       ]
     },
+    {'type': 'lists_create_empty'},
+    {'type': 'lists_repeat' },
+    {'type': 'input_value'},
+    {'type': 'input_value'},
+    {'type': 'lists_reverse'},
+    {'type': 'input_value'},
+    {'type': 'lists_isEmpty'},
+    {'type': 'input_value'},
+    {'type': 'lists_length'},
+    {'type': 'input_value'}
+    
     
     
     // You can add more blocks to this array.
