@@ -20,7 +20,7 @@ const toolbox1 = {
         { "kind": "block", "type": "math_arithmetic" }
       ]
     },
-    {'type': 'lists_create_empty'},
+    {'type': 'lists_create_empty'},//kind全部必要
     {'type': 'lists_repeat' },
     {'type': 'input_value'},
     {'type': 'input_value'},
