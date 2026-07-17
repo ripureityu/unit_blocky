@@ -1,20 +1,161 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>My Blockly App</title>
-  
+  <meta charset="utf-8">
+  <title>ロボットプログラミングプラットフォーム</title>
   <script src="https://unpkg.com/blockly/blockly.min.js"></script>
-  
+  <script src="https://unpkg.com/blockly/msg/ja.js"></script>
+
   <style>
-    /* 画面いっぱいに表示するための設定 */
-    html, body { height: 100%; margin: 0; }
-    #blocklyDiv { height: 100vh; width: 100vw; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+    }
+    h1 {
+      padding-left: 20px;
+      margin: 10px 0;
+    }
+    /* Blocklyを表示するエリアのスタイル */
+    #blocklyDiv {
+      height: calc(100% - 60px);
+      width: 100%;
+    }
   </style>
 </head>
 <body>
+
+  <h1>ロボット制御プラットフォーム（プロトタイプ）</h1>
+  
   <div id="blocklyDiv"></div>
 
-  <script src="main.js"></script>
+  <script>
+    // 1. ツールボックス（カテゴリ）の構成をJSONで定義
+    const toolboxConfiguration = {
+      'kind': 'categoryToolbox',
+      'contents': [
+        {
+          'kind': 'category',
+          'name': '制御 (control)',
+          'categorystyle': 'logic_category',
+          'contents': [
+            {'kind': 'block', 'type': 'controls_if'},
+            {'kind': 'block', 'type': 'logic_compare'},
+            {'kind': 'block', 'type': 'logic_operation'},
+            {'kind': 'block', 'type': 'logic_negate'},
+            {'kind': 'block', 'type': 'logic_boolean'},
+            {'kind': 'block', 'type': 'logic_null'},
+            {'kind': 'block', 'type': 'logic_ternary'}           
+
+          ]
+        },
+        {
+          'kind': 'category',
+          'name': '論理 (Logic)',
+          'categorystyle': 'logic_category',
+          'contents': [
+            {'kind': 'block', 'type': 'controls_if'},
+            {'kind': 'block', 'type': 'logic_compare'},
+            {'kind': 'block', 'type': 'logic_operation'},
+            {'kind': 'block', 'type': 'logic_boolean'}
+          ]
+        },
+        {
+          'kind': 'category',
+          'name': ' 数字(Math)',
+          'categorystyle': 'logic_category',
+          'contents': [
+            {'kind': 'block', 'type': 'math_number'},
+            {'kind': 'block', 'type': 'math_arithmetic'},
+            {'kind': 'block', 'type': 'math_single'},
+            {'kind': 'block', 'type': 'math_trig'},
+            {'kind': 'block', 'type': 'math_constant'},
+            {'kind': 'block', 'type': 'math_number_property'},
+            {'kind': 'block', 'type': 'math_round'},
+            {'kind': 'block', 'type': 'math_on_list'},
+            {'kind': 'block', 'type': 'math_modulo'},
+            {'kind': 'block', 'type': 'math_constrain'},
+            {'kind': 'block', 'type': 'math_random_int'},
+            {'kind': 'block', 'type': 'math_random_float'}
+          ]
+        },
+        {
+          'kind': 'category',
+          'name': 'ループ (Loops)',
+          'categorystyle': 'loop_category',
+          'contents': [
+            {'kind': 'block', 'type': 'controls_repeat_ext'},
+            {'kind': 'block', 'type': 'controls_whileUntil'},
+            {'kind': 'block', 'type': 'controls_for'},
+            {'kind': 'block', 'type': 'controls_forEach'},
+            {'kind': 'block', 'type': 'controls_flow_statements'}
+          ]
+        },
+        {
+          'kind': 'category',
+          'name': 'テキスト (Text)',
+          'categorystyle': 'text_category',
+          'contents': [
+            {'kind': 'block', 'type': 'text'},
+            {'kind': 'block', 'type': 'text_join'},
+            {'kind': 'block', 'type': 'text_append'},
+            {'kind': 'block', 'type': 'text_length'},
+            {'kind': 'block', 'type': 'text_isEmpty'},
+            {'kind': 'block', 'type': 'text_indexOf'},
+            {'kind': 'block', 'type': 'text_charAt'},
+            {'kind': 'block', 'type': 'text_getSubstring'},
+            {'kind': 'block', 'type': 'text_changeCase'},
+            {'kind': 'block', 'type': 'text_trim'},
+            {'kind': 'block', 'type': 'text_print'},
+            {'kind': 'block', 'type': 'text_prompt_ext'}
+          ]
+        },
+        {
+          'kind': 'category',
+          'name': '変数 (Variables)',
+          'categorystyle': 'variable_category',
+          'custom': 'VARIABLE' // 変数はBlocklyが自動生成してくれる特殊な設定
+        },
+        {
+          'kind': 'category',
+          'name': '関数',
+          'categorystyle': 'procedure_category',
+          'custom': 'PROCEDURE' // 関数はBlocklyが自動で定義・呼び出しブロックを生成
+        },
+        // --- ここから将来ロボット用を追加していくエリア ---
+        {
+          'kind': 'sep' // カテゴリ間の区切り線
+        },
+        {
+          'kind': 'category',
+          'name': 'ロボット機能',
+          'colour': '230',
+          'contents': [
+            // ここに将来「前進する」「右に曲がる」などの自作ブロックを追加します
+          ]
+        }
+      ]
+    };
+
+    // 2. Blocklyを画面に埋め込む
+    const workspace = Blockly.inject('blocklyDiv', {
+      toolbox: toolboxConfiguration,
+      grid: { // 背景にグリッド線を表示（任意）
+        spacing: 20,
+        length: 3,
+        colour: '#ccc',
+        snap: true
+      },
+      zoom: { // 拡大縮小ボタンを表示（任意）
+        controls: true,
+        wheel: true,
+        startScale: 1.0,
+        maxScale: 3,
+        minScale: 0.3,
+        scaleSpeed: 1.2
+      }
+    });
+  </script>
 </body>
 </html>
