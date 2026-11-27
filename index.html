@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <title>ロボットプログラミングプラットフォーム</title>
   <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+  <script src="https://unpkg.com/blockly/python_compressed.js"></script>
   <script src="https://unpkg.com/blockly/msg/ja.js"></script>
 
   <style>
@@ -13,7 +14,7 @@
       padding: 0;
       font-family: sans-serif;
     }
-    h1 {
+    p {
       padding-left: 20px;
       margin: 10px 0;
     }
@@ -26,11 +27,82 @@
 </head>
 <body>
 
-  <h1>ロボット制御プラットフォーム（プロトタイプ）</h1>
+  <p>ロボット制御プラットフォーム</p>
+  <button onclick="sendPythonCode()" style="padding: 8px 16px; cursor: pointer;">
+      Pythonコードを生成・送信
+  </button>
   
   <div id="blocklyDiv"></div>
 
   <script>
+    Blockly.defineBlocksWithJsonArray([
+  // 前進ブロック
+  {
+    "type": "robot_move_forward",
+    "message0": "%1 cm 前進する",
+    "args0": [
+      { "type": "field_number", "name": "DISTANCE", "value": 10, "min": 1 }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 230,
+    "tooltip": "指定した距離だけ前進します"
+  },
+  // 回転ブロック
+  {
+    "type": "robot_turn",
+    "message0": "%1 に %2 度 回転する",
+    "args0": [
+      {
+        "type": "field_dropdown",
+        "name": "DIRECTION",
+        "options": [ ["右", "right"], ["左", "left"] ]
+      },
+      { "type": "field_angle", "name": "ANGLE", "angle": 90 }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 230,
+    "tooltip": "指定した方向と角度に回転します"
+  }
+]);
+// 「前進する」ブロックのPython変換ルール
+python.pythonGenerator.forBlock['robot_move_forward'] = function(block) {
+  const distance = block.getFieldValue('DISTANCE');
+  return `robot.move_forward(${distance})\n`;
+};
+
+// 「回転する」ブロックのPython変換ルール
+python.pythonGenerator.forBlock['robot_turn'] = function(block) {
+  const direction = block.getFieldValue('DIRECTION');
+  const angle = block.getFieldValue('ANGLE');
+  return `robot.turn('${direction}', ${angle})\n`;
+};
+async function sendPythonCode() {
+  // 1. ワークスペースのブロックをPythonコードに変換
+  const code = python.pythonGenerator.workspaceToCode(workspace);
+  console.log("生成されたPythonコード:\n" + code);
+
+  // 2. サーバー（Arduino等）のURLへPOST送信
+  const serverUrl = "http://192.168.1.100:80/run"; // ← 実際のサーバーのIP・ポートに変更
+
+  try {
+    const response = await fetch(serverUrl, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
+      body: code
+    });
+    if (response.ok) {
+      alert("送信成功！\n\n" + code);
+    } else {
+      alert("サーバーエラー: " + response.status);
+    }
+  } catch (error) {
+    // サーバーがまだ立っていない場合はここでエラーになります
+    alert("送信失敗（サーバー未起動など）\n生成されたコード:\n\n" + code);
+  }
+}
+
     // 1. ツールボックス（カテゴリ）の構成をJSONで定義
     const toolboxConfiguration = {
       'kind': 'categoryToolbox',
@@ -52,19 +124,8 @@
         },
         {
           'kind': 'category',
-          'name': '論理 (Logic)',
-          'categorystyle': 'logic_category',
-          'contents': [
-            {'kind': 'block', 'type': 'controls_if'},
-            {'kind': 'block', 'type': 'logic_compare'},
-            {'kind': 'block', 'type': 'logic_operation'},
-            {'kind': 'block', 'type': 'logic_boolean'}
-          ]
-        },
-        {
-          'kind': 'category',
           'name': ' 数字(Math)',
-          'categorystyle': 'logic_category',
+          'categorystyle': 'math_category',
           'contents': [
             {'kind': 'block', 'type': 'math_number'},
             {'kind': 'block', 'type': 'math_arithmetic'},
@@ -132,7 +193,8 @@
           'name': 'ロボット機能',
           'colour': '230',
           'contents': [
-            // ここに将来「前進する」「右に曲がる」などの自作ブロックを追加します
+            {'kind': 'block', 'type': 'robot_move_forward'},
+            {'kind': 'block', 'type': 'robot_turn'}
           ]
         }
       ]
