@@ -1,0 +1,1 @@
+git config --global user.name "ripureityu" user.email "tanaka.yuudai@it-mirai-h.ibk.ed.jp"
